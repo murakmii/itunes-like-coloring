@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>iTunes Coloring</title>
+      <meta charset="utf-8" />
+      <link rel="stylesheet" href="./index.css" />
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+      <script src="./itunes_like_coloring.js"></script>
+      <script type="text/javascript">
+
+         function render( file, canvas, size ) {
+
+            // 画像を読み込む
+            var img    = new Image( );
+            img.src    = window.URL.createObjectURL( file );
+            img.onload = function( ) {
+
+               // 読み込んだら指定サイズのcanvasに描画 
+               var w  = img.width, h = img.height;
+
+               var cw = w > h ? size : Math.ceil( size *  ( w / h ) );
+               var ch = h > w ? size : Math.ceil( size *  ( h / w ) );
+
+               canvas.setAttribute( 'width', cw );
+               canvas.setAttribute( 'height', ch );
+
+               var ctx = canvas.getContext( '2d' );
+               ctx.drawImage(
+                  img,
+                  0, 0, w, h,
+                  0, 0, cw, ch
+               );
+
+            }
+         }
+
+         $( function( ) {
+            $( document.header.coloring ).click( function( ) {
+
+               var file = document.header.image.files[ 0 ] ? document.header.image.files[ 0 ] : null;
+               if (file === null || !file.type.match( 'image.*' ) ) {
+                  alert( 'please select image file.' );
+               }
+
+               iTunesLikeColoring.loadRgb( file, 64, function( rgb ) {
+                  iTunesLikeColoring.cropBorder( 64, rgb, function( border, body ) {
+
+                     border = iTunesLikeColoring.calcDominantColor( border, 1, 20, 40 );
+                     body   = iTunesLikeColoring.calcDominantColor( body, 2, 20, 40, border[ 0 ], 100 );
+
+                     var bkg  = border[ 0 ];
+                     var sub1 = body[ 0 ];
+                     var sub2 = body[ 1 ];
+
+                     var tpl = document.getElementById( 'result' );
+
+                     var sub = tpl.content.querySelectorAll( '.sub1' );
+                     for( var i = 0; i < sub.length; i++ ) {
+                        sub[ i ].style.color = 'rgb(' +  sub1.r + ',' + sub1.g + ',' + sub1.b + ')';
+                     }
+
+                     var sub = tpl.content.querySelectorAll( '.sub2' );
+                     for( var i = 0; i < sub.length; i++ ) {
+                        sub[ i ].style.color = 'rgb(' +  sub2.r + ',' + sub2.g + ',' + sub2.b + ')';
+                     }
+
+                     var div = $( '<div class="result"></div>' );
+                     div.append( document.importNode( tpl.content, true ) );
+                     render( file, div.find( 'canvas' ).get( 0 ), 128 );
+                     div.css( 'background-color', 'rgb(' +  bkg.r + ',' + bkg.g + ',' + bkg.b + ')' );
+                     $( document.body ).append( div );
+
+                  } );
+               } );
+
+            } );
+         } );
+
+      </script>
+   </head>
+   <body>
+      <template id="result">
+         <canvas width="0" height="0"></canvas>
+         <div>
+            <h1 class="sub1">サンプルタイトル</h1>
+            <h2 class="sub2">作曲者</h2>
+
+            <ul>
+               <li><span class="sub2">1</span><span class="sub1">曲名1<span></li>
+               <li><span class="sub2">2</span><span class="sub1">曲名2<span></li>
+               <li><span class="sub2">3</span><span class="sub1">曲名3<span></li>
+            </ul>
+         </div>
+      </template>
+
+      <form id="header" name="header">
+         <h1>iTunes like coloring</h1>
+         <p>画像を選択して"Coloring"をクリックするとそれっぽいのが表示されます</p>
+         <input type="file" name="image">
+         <button type="button" name="coloring">Coloring</button>
+      </form>
+
+   </body>
+</html>
