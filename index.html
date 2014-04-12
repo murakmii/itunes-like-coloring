@@ -42,11 +42,11 @@
                   alert( 'please select image file.' );
                }
 
-               iTunesLikeColoring.loadRgb( file, 128, function( rgb ) {
-                  iTunesLikeColoring.cropBorder( 128, rgb, function( border, body ) {
+               iTunesLikeColoring.loadRgb( file, 64, function( rgb ) {
+                  iTunesLikeColoring.cropBorder( 64, rgb, function( border, body ) {
 
-                     border = iTunesLikeColoring.calcDominantColor( border, 1, 20, 40 );
-                     body   = iTunesLikeColoring.calcDominantColor( body, 2, 20, 40, border[ 0 ], 100 );
+                     border = iTunesLikeColoring.calcDominantColor( border, 1, 30, 50 );
+                     body   = iTunesLikeColoring.calcDominantColor( body, 2, 30, 50, border[ 0 ], 100 );
 
                      var bkg  = border[ 0 ] || { r: 255, g: 255, b: 255 };
                      var sub1 = body[ 0 ] || { r: 0, g: 0, b: 0 };
